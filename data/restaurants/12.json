@@ -1,0 +1,9 @@
+{
+  "idRestaurant": 12,
+  "name": "Central Asia Restaurant",
+  "workingHours": "Mon-Sat 24h",
+  "address": "B-16-8, Jalan Yap Kwan Seng, Kampung Baru, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur",
+  "cuisine": "Uzbek and Russian cuisine",
+  "image": "http://redcard.my/images/Restaurant-Central-Asia/picture-1(26).jpg",
+  "rating": 4.1
+}

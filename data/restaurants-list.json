@@ -1,0 +1,12 @@
+{
+  "restaurantList": [
+    {
+      "idRestaurant": 11,
+      "name": "Astana Restaurant"
+    },
+    {
+      "idRestaurant": 12,
+      "name": "Central Asia Restaurant"
+    }
+  ]
+}

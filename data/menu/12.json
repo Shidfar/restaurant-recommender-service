@@ -1,0 +1,36 @@
+{
+  "idRestaurant": 12,
+  "idMenu": 41,
+  "menuList": [
+    {
+      "idFood": 111,
+      "nameFood": "Beshbarmak",
+      "description": "Kazakh traditional boiled dough with beef and horsemeat",
+      "price": 35.5
+    },
+    {
+      "idFood": 112,
+      "nameFood": "Manty",
+      "description": "steamed grounded beef covered in dough",
+      "price": 14.2
+    },
+    {
+      "idFood": 113,
+      "nameFood": "Borsh",
+      "description": "Russian soup with beef, potato, beetroot, cabbage, carrot",
+      "price": 12.1
+    },
+    {
+      "idFood": 114,
+      "nameFood": "Pelmeni",
+      "description": "boiled grounded beef covered in dough",
+      "price": 14.90
+    },
+    {
+      "idFood": 115,
+      "nameFood": "Plov",
+      "description": "rice cooked with beef and carrot",
+      "price": 14.4
+    }
+  ]
+}
