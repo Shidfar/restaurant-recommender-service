@@ -1,0 +1,30 @@
+[
+  {
+    "userId": 1,
+    "email": "kurmangaliyevakarina@gmail.com",
+    "password": "123456",
+    "phone": "+60123217823",
+    "address": "bla bla bla"
+  },
+  {
+    "userId": 2,
+    "email": "shidfar@blackbox.com",
+    "password": "123456",
+    "phone": "+60123217823",
+    "address": "bla bla bla"
+  },
+  {
+    "userId": 3,
+    "email": "stalin@ussr.soc",
+    "password": "123456",
+    "phone": "+60123217823",
+    "address": "bla bla bla"
+  },
+  {
+    "userId": 4,
+    "email": "lenin@ussr.soc",
+    "password": "123456",
+    "phone": "+60123217823",
+    "address": "bla bla bla"
+  }
+]

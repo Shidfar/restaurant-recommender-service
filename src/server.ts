@@ -24,8 +24,10 @@ export default async () => {
         app.use(expressValidator())
 
         const config = require(configPath)
+        const userBase = require(`${dataPath}/users.json`)
         const context: Context = {
-            config
+            config,
+            userBase
         }
         // initialize services
         initializeServices(context)
@@ -43,7 +45,7 @@ const initializeServices = (context: Context) => {
 }
 
 const initializeExpressRoutes = (context: Context, app = Express()) => {
-    const { config } = context
+    const { config, userBase } = context
 
     app.use(Cors({
         origin: config.cors.allowedOrigins,
@@ -55,10 +57,10 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.get('/restaurants', (req, res) => {
         try {
             const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants-list.json`, 'utf8'))
-            res.send(obj)
+            return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
-            res.sendStatus(404)
+            return res.sendStatus(404)
         }
     })
 
@@ -66,10 +68,10 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         try {
             const { rId } = req.params
             const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants/${rId}.json`, 'utf8'))
-            res.send(obj)
+            return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
-            res.sendStatus(404)
+            return res.sendStatus(404)
         }
     })
 
@@ -77,11 +79,50 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         try {
             const { mId } = req.params
             const obj = JSON.parse(FS.readFileSync(`${dataPath}/menu/${mId}.json`, 'utf8'))
-            res.send(obj)
+            return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
-            res.sendStatus(404)
+            return res.sendStatus(404)
         }
+    })
+
+    app.post('/user/login', (req, res) => {
+        try {
+            const { email, password } = req.body
+            const match = userBase.filter(obj => obj.email === email && obj.password === password)
+            if (match.length !== 1) {
+                return res.sendStatus(404)
+            }
+            return res.send({ 'accountId': match[0].userId })
+        } catch (e) {
+            console.log(' error while processing request.', e)
+            return res.sendStatus(500)
+        }
+    })
+
+    app.post('/user/register', (req, res) => {
+        try {
+            const { email, password, phone, address } = req.body
+
+            const match = userBase.filter(obj => obj.email === email && obj.password === password)
+            if (match.length === 1) {
+                return res.sendStatus(409)
+            }
+
+            const len = userBase.length
+            const userId = userBase[len - 1].userId + 1
+            const obj = { userId, email, password, phone, address }
+            userBase.push(obj)
+            const json = JSON.stringify(userBase, undefined, 2)
+            FS.writeFile(`${dataPath}/users.json`, json, 'utf8', () => {
+                console.log('Write successful.')
+                return res.send({ 'accountId': userId })
+            })
+        } catch (e) {
+            console.log(' error while processing request.', e)
+            return res.sendStatus(500)
+        }
+
     })
 
     // Add a catchall handler, for 404

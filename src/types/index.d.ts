@@ -1,5 +1,6 @@
 export interface Context {
     config: Config
+    userBase: any[]
 }
 
 export interface Config {
