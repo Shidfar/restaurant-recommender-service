@@ -36,52 +36,34 @@ const users = require('../data/users.json');
 
 (async () => {
     for (user of users) {
-        const values = { ...user, userId: undefined }
+        const { email, password, phone, address } = user
+        const values = { email, password, phone, address }
         await insertData('users', values)
     }
 
-    for (restaurant of restaurants) {
-        const values = { ...restaurant, idRestaurant: undefined }
+    let c = 1;
+    for (restaurant of restaurants.restaurantList) {
+        const { name } = restaurant
+        const values = { name }
         await insertData('restaurants', values)
-        await insertData('restaurant_menu', { restaurant_id: restaurant.idRestaurant })
+        await insertData('restaurant_menu', { restaurant_id: c })
+        c++;
     }
 
-    for (restaurant of restaurants) {
-        const values = { ...restaurant, idRestaurant: undefined }
-        await insertData('restaurants', values)
-    }
-    await insertData('restaurant_menu', { restaurant_id: 1 })
-    await insertData('restaurant_menu', { restaurant_id: 2 })
-    await insertData('restaurant_descriptions', { ...descs11,
-        restaurant_id: 1,
-        workingHours: undefined,
-        working_hours: descs11.workingHours,
-        idRestaurant: undefined
-    })
+    let { name, workingHours: working_hours, address, cuisine, image, rating } = descs11
 
-    await insertData('restaurant_descriptions', { ...descs12,
-        restaurant_id: 2,
-        workingHours: undefined,
-        working_hours: descs11.workingHours,
-        idRestaurant: undefined
-    })
+    await insertData('restaurant_descriptions', { name, working_hours, address, cuisine, image, rating })
+    ({ name, workingHours: working_hours, address, cuisine, image, rating } = descs12)
+    await insertData('restaurant_descriptions', { name, working_hours, address, cuisine, image, rating })
 
     for (menu of menu11.menuList) {
-        await insertData('food', { ...menu,
-            menu_id: 1,
-            idFood: undefined,
-            nameFood: undefined,
-            name: menu.nameFood
-        })
+        const { nameFood: name, description, price } = menu
+        await insertData('food', { menu_id: 1, name, description, price })
     }
 
     for (menu of menu12.menuList) {
-        await insertData('food', { ...menu,
-            menu_id: 2,
-            idFood: undefined,
-            nameFood: undefined,
-            name: menu.nameFood
-        })
+        const { nameFood: name, description, price } = menu
+        await insertData('food', { menu_id: 1, name, description, price })
     }
 
 })()
