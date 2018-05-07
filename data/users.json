@@ -26,5 +26,17 @@
     "password": "123456",
     "phone": "+60123217823",
     "address": "bla bla bla"
+  },
+  {
+    "userId": 5,
+    "email": "kurmangaliyeva.karina@gmail.com",
+    "password": "123456",
+    "address": "riana green"
+  },
+  {
+    "userId": 6,
+    "email": "anna@mail.com",
+    "password": "123456",
+    "address": "casa tropicana"
   }
 ]
