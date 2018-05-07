@@ -91,5 +91,25 @@ export function Client(context: Context): DbWrapper {
         })
     }
 
-    return { insertInto, getRestaurants, getRestaurantDescriptionById, getRestaurantMenu }
+    function getUser(email: string, password: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            pool.getConnection(function(err, connection) {
+                if (err) {
+                    console.log('Could not get connection from the pool.', err)
+                    return reject(err)
+                }
+                const q = `SELECT id FROM users WHERE email = "${email}" AND password = "${password}"`
+                connection.query(q, (error, results, fields) => {
+                    connection.release()
+                    if (error) {
+                        console.log('Could not query.', error, results)
+                        return reject(error)
+                    }
+                    return resolve(results)
+                })
+            })
+        })
+    }
+
+    return { insertInto, getRestaurants, getRestaurantDescriptionById, getRestaurantMenu, getUser }
 }

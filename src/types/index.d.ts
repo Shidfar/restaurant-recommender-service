@@ -22,4 +22,5 @@ export interface DbWrapper {
     getRestaurants(): Promise<any>
     getRestaurantDescriptionById(restaurantId: number): Promise<any>
     getRestaurantMenu(restaurantId: number): Promise<any>
+    getUser(email: string, password: string): Promise<any>
 }

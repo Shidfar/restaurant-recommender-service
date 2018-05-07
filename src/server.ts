@@ -123,14 +123,14 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         }
     })
 
-    app.post('/user/login', (req, res) => {
+    app.post('/user/login', async (req, res) => {
         try {
             const { email, password } = req.body
-            const match = userBase.filter(obj => obj.email === email && obj.password === password)
-            if (match.length !== 1) {
+            const match = await db.getUser(email, password)
+            if (match.length != 1) {
                 return res.sendStatus(404)
             }
-            return res.send({ 'accountId': match[0].userId })
+            return res.send({ 'accountId': match[0].id })
         } catch (e) {
             console.log(' error while processing request.', e)
             return res.sendStatus(500)
@@ -161,6 +161,10 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         }
 
     })
+
+    // TODO: Order
+    // TODO: rating
+    // TODO: review
 
     // Add a catchall handler, for 404
     app.all('*', (req, res) => {
