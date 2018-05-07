@@ -78,7 +78,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.get('/restaurants/description/:restaurantId', async (req, res) => {
         try {
             const { restaurantId } = req.params
-            const result = await db.getRestaurants()
+            const result = await db.getRestaurantDescriptionById(restaurantId)
             if (!result.length || result.length < 1) {
                 return res.sendStatus(404)
             }
