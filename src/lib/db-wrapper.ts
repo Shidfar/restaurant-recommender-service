@@ -76,7 +76,7 @@ export function Client(context: Context): DbWrapper {
                     console.log('Could not get connection from the pool.', err)
                     return reject(err)
                 }
-                const q = `SELECT * FROM food 
+                const q = `SELECT * FROM food
                             WHERE menu_id
                             IN ( SELECT id FROM restaurant_menu WHERE restaurant_id = ${restaurantId} )`
                 connection.query(q, (error, results, fields) => {

@@ -102,7 +102,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         try {
             const { restaurantId } = req.params
             const result = await db.getRestaurantMenu(restaurantId)
-            const menuId = result[0] && result[0].menu_id;
+            const menuId = result[0] && result[0].menu_id
             const menuList = result.map((m: any) => {
                 return {
                     idFood: m.id,
