@@ -25,7 +25,7 @@ export function Client(context: Context): DbWrapper {
                         console.log('Could not query.', error, results)
                         return reject(error)
                     }
-                    return resolve({ results, fields })
+                    return resolve(results)
                 })
             })
         })
@@ -44,11 +44,30 @@ export function Client(context: Context): DbWrapper {
                         console.log('Could not query.', error, results)
                         return reject(error)
                     }
-                    return resolve({ results, fields })
+                    return resolve(results)
                 })
             })
         })
     }
 
-    return { insertInto, getRestaurants }
+    function getRestaurantDescriptionById(restaurantId: number): Promise<any> {
+        return new Promise((resolve, reject) => {
+            pool.getConnection(function(err, connection) {
+                if (err) {
+                    console.log('Could not get connection from the pool.', err)
+                    return reject(err)
+                }
+                connection.query(`SELECT * FROM restaurant_descriptions WHERE restaurant_id = ${restaurantId}`, (error, results, fields) => {
+                    connection.release()
+                    if (error) {
+                        console.log('Could not query.', error, results)
+                        return reject(error)
+                    }
+                    return resolve(results)
+                })
+            })
+        })
+    }
+
+    return { insertInto, getRestaurants, getRestaurantDescriptionById }
 }

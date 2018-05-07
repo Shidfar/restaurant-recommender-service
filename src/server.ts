@@ -64,19 +64,26 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.get('/restaurants', async (req, res) => {
         try {
             const result = await db.getRestaurants()
-            console.log(JSON.stringify(result, undefined, 2))
-            const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants-list.json`, 'utf8'))
-            return res.send(obj)
+            if (!result.length || result.length < 1) {
+                return res.sendStatus(404)
+            }
+            const restaurantList = result.map((x: any) => { return { idRestaurant: x.id, name: x.name } })
+            return res.send({ restaurantList })
         } catch (e) {
             console.log(' error while processing request.', e)
             return res.sendStatus(404)
         }
     })
 
-    app.get('/restaurants/description/:rId', (req, res) => {
+    app.get('/restaurants/description/:restaurantId', async (req, res) => {
         try {
-            const { rId } = req.params
-            const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants/${rId}.json`, 'utf8'))
+            const { restaurantId } = req.params
+            const result = await db.getRestaurants()
+            if (!result.length || result.length < 1) {
+                return res.sendStatus(404)
+            }
+            console.log(' .. >> ', JSON.stringify(result, undefined, 2))
+            const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants/${restaurantId}.json`, 'utf8'))
             return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
