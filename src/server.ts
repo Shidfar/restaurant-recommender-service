@@ -77,13 +77,27 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
 
     app.get('/restaurants/description/:restaurantId', async (req, res) => {
         try {
+            // {
+            //     "idRestaurant": 11,
+            //     "name": "Astana Restaurant",
+            //     "workingHours": "Everyday 12-0",
+            //     "address": "A, Endah Promenade, 10, Jalan 1/149e, Sri Petaling, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur",
+            //     "cuisine": "Kazakh and Russian cuisine",
+            //     "image": "https://media.timeout.com/images/103948102/630/472/image.jpg",
+            //     "rating": 3.8
+            // }
             const { restaurantId } = req.params
             const result = await db.getRestaurantDescriptionById(restaurantId)
-            if (!result.length || result.length < 1) {
+            if (!result.length || result.length < 1 || result.length > 1) {
                 return res.sendStatus(404)
             }
-            console.log(' .. >> ', JSON.stringify(result, undefined, 2))
-            const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants/${restaurantId}.json`, 'utf8'))
+            const desc = result[0]
+            const obj = {
+                ...desc,
+                idRestaurant: desc.restaurant_id,
+                id: undefined,
+                restaurant_id: undefined
+            }
             return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
