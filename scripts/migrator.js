@@ -6,23 +6,21 @@ const connection = mysql.createConnection({
     password : '1234',
     database : 'restaurant_recommender_db'
 });
+connection.connect();
 
 function insertData(table, values) {
-    try {
-        return new Promise((resolve) => {
-            connection.connect();
+    return new Promise((resolve) => {
+        try {
             const query = connection.query(`INSERT INTO ${table} SET ?`, values,
                 (error, results, fields) => {
                     if (error) throw error;
+                    console.log(query.sql);
+                    return resolve();
                 });
-            connection.end(() => {
-                console.log(query.sql);
-                return resolve()
-            });
-        })
-    } catch (e) {
-        console.log('Error: ', e)
-    }
+        } catch (e) {
+            console.log('Error: ', e)
+        }
+    })
 }
 
 const menu11 = require('../data/menu/11.json');
