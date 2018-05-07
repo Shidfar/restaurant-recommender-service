@@ -3,11 +3,12 @@ import * as BodyParser from 'body-parser'
 import * as Express from 'express'
 import * as expressValidator from 'express-validator'
 import * as Cors from 'cors'
-import * as FS from 'fs'
 
 import Injector from './lib/dependency-injector'
 import * as DB from './lib/db-wrapper'
-import { Context, DbWrapper } from 'index'
+import * as RatingAgent from './lib/rating-agent'
+
+import { Context, DbWrapper, RatingAgentInterface } from 'index'
 
 const pkgPath = path.join(__dirname, '../package.json')
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -18,7 +19,6 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 const configPath = path.join(__dirname, `../config/${process.env.NODE_ENV}.json`)
-const dataPath = path.join(__dirname, `../data`)
 export default async () => {
     try {
         const app = Express()
@@ -26,10 +26,8 @@ export default async () => {
         app.use(expressValidator())
 
         const config = require(configPath)
-        const userBase = require(`${dataPath}/users.json`)
         const context: Context = {
-            config,
-            userBase
+            config
         }
         // initialize services
         initializeServices(context)
@@ -47,10 +45,14 @@ const initializeServices = (context: Context) => {
     Injector.current.registerAsSingleton(DB.name, () => {
         return DB.Client(context)
     })
+    Injector.current.register(RatingAgent.name, () => {
+        return RatingAgent.Client(context, Injector.current.retrieve<DbWrapper>(DB.name))
+    })
+
 }
 
 const initializeExpressRoutes = (context: Context, app = Express()) => {
-    const { config, userBase } = context
+    const { config } = context
 
     app.use(Cors({
         origin: config.cors.allowedOrigins,
@@ -60,6 +62,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.disable('x-powered-by')
 
     const db = Injector.current.retrieve<DbWrapper>(DB.name)
+    const ratingAgent = Injector.current.retrieve<RatingAgentInterface>(RatingAgent.name)
 
     app.get('/restaurants', async (req, res) => {
         try {
@@ -67,7 +70,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
             if (!result.length || result.length < 1) {
                 return res.sendStatus(404)
             }
-            const restaurantList = result.map((x: any) => { return { idRestaurant: x.id, name: x.name } })
+            const restaurantList = result.map((x: any) => { return { idRestaurant: x.id, name: x.name, rating: x.rating } })
             return res.send({ restaurantList })
         } catch (e) {
             console.log(' error while processing request.', e)
@@ -123,10 +126,31 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         }
     })
 
+    app.get('/restaurants/reviews/:restaurantId', async (req, res) => {
+        try {
+            const { restaurantId } = req.params
+            const result = await db.getRestaurantReviewsById(restaurantId)
+            const reviewList = result.map((r: any) => {
+                return {
+                    idReview: r.id,
+                    userEmail: r.email,
+                    review: r.review
+                }
+            })
+
+            return res.send({ reviewList })
+        } catch (e) {
+            console.log(' error while processing request.', e)
+            return res.sendStatus(404)
+        }
+    })
+
     app.post('/user/login', async (req, res) => {
         try {
             const { email, password } = req.body
-            const match = await db.getUser(email, password)
+            const lcEmail = email.toLowerCase()
+            const lcPassword = password.toLowerCase()
+            const match = await db.getUser(lcEmail, lcPassword)
             if (match.length != 1) {
                 return res.sendStatus(404)
             }
@@ -140,13 +164,15 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.post('/user/register', async (req, res) => {
         try {
             const { email, password, phoneNumber, address } = req.body
-            const result = await db.getUser(email, password)
+            const lcEmail = email.toLowerCase()
+            const lcPassword = password.toLowerCase()
+            const result = await db.getUser(lcEmail, lcPassword)
             if (result.length > 0) {
                 return res.sendStatus(409)
             }
-            const obj = { email, password, phone: phoneNumber, address }
+            const obj = { email: lcEmail, password: lcPassword, phone: phoneNumber, address }
             await db.insertInto('users', obj)
-            const match = await db.getUser(email, password)
+            const match = await db.getUser(lcEmail, lcPassword)
             if (match.length != 1) {
                 return res.sendStatus(404)
             }
@@ -158,9 +184,47 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
 
     })
 
-    // TODO: Order
-    // TODO: rating
-    // TODO: review
+    app.post('/user/restaurant/review/submit', async (req, res) => {
+        try {
+            const { restaurantId, accountId, review } = req.body
+            const obj = {
+                restaurant_id: restaurantId,
+                user_id: accountId,
+                review
+            }
+            await db.insertInto('reviews', obj)
+            res.sendStatus(200)
+        } catch (e) {
+            console.log('Could not insert review')
+            res.sendStatus(500)
+        }
+    })
+
+    app.post('/user/restaurant/rate', async (req, res) => {
+        try {
+            const { restaurantId, accountId, rating } = req.body
+            const obj = {
+                restaurant_id: restaurantId,
+                user_id: accountId,
+                rating
+            }
+            await db.insertInto('ratings', obj)
+            ratingAgent.rateRestaurant(restaurantId)
+            return res.sendStatus(200)
+        } catch (e) {
+            console.log('Could not insert review')
+            res.sendStatus(500)
+        }
+    })
+
+    app.post('/user/order/submit', async (req, res) => {
+        try {
+            res.sendStatus(200)
+        } catch (e) {
+            console.log('Could not process the order')
+            res.sendStatus(500)
+        }
+    })
 
     // Add a catchall handler, for 404
     app.all('*', (req, res) => {
