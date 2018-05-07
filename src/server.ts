@@ -94,7 +94,9 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
             const desc = result[0]
             const obj = {
                 ...desc,
+                workingHours: desc.working_hours,
                 idRestaurant: desc.restaurant_id,
+                working_hours: undefined,
                 id: undefined,
                 restaurant_id: undefined
             }
