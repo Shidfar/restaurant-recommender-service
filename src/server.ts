@@ -70,7 +70,11 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
             if (!result.length || result.length < 1) {
                 return res.sendStatus(404)
             }
-            const restaurantList = result.map((x: any) => { return { idRestaurant: x.id, name: x.name, rating: x.rating } })
+            const restaurantList = result.map((x: any) => {
+                return {
+                    idRestaurant: x.id,
+                    name: x.name,
+                    rating: Math.round(x.rating * 10) / 10 } })
             return res.send({ restaurantList })
         } catch (e) {
             console.log(' error while processing request.', e)
@@ -88,6 +92,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
             const desc = result[0]
             const obj = {
                 ...desc,
+                rating: (Math.round(desc.rating * 10) / 10),
                 workingHours: desc.working_hours,
                 idRestaurant: desc.restaurant_id,
                 working_hours: undefined,
