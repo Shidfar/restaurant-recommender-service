@@ -104,7 +104,7 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         try {
             const { email, password, phone, address } = req.body
 
-            const match = userBase.filter(obj => obj.email === email && obj.password === password)
+            const match = userBase.filter(obj => obj.email === email)
             if (match.length === 1) {
                 return res.sendStatus(409)
             }
