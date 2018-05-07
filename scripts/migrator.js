@@ -33,20 +33,20 @@ const restaurants = require('../data/restaurants-list.json');
 const users = require('../data/users.json');
 
 (async () => {
-    // for (user of users) {
-    //     const { email, password, phone, address } = user
-    //     const values = { email, password, phone, address }
-    //     await insertData('users', values)
-    // }
-    //
-    // let c = 1;
-    // for (restaurant of restaurants.restaurantList) {
-    //     const { name } = restaurant
-    //     const values = { name }
-    //     await insertData('restaurants', values)
-    //     await insertData('restaurant_menu', { restaurant_id: c })
-    //     c++;
-    // }
+    for (user of users) {
+        const { email, password, phone, address } = user
+        const values = { email, password, phone, address }
+        await insertData('users', values)
+    }
+
+    let c = 1;
+    for (restaurant of restaurants.restaurantList) {
+        const { name } = restaurant
+        const values = { name }
+        await insertData('restaurants', values)
+        await insertData('restaurant_menu', { restaurant_id: c })
+        c++;
+    }
 
     let { name, workingHours: working_hours, address, cuisine, image, rating } = descs11
 
