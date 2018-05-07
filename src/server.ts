@@ -77,15 +77,6 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
 
     app.get('/restaurants/description/:restaurantId', async (req, res) => {
         try {
-            // {
-            //     "idRestaurant": 11,
-            //     "name": "Astana Restaurant",
-            //     "workingHours": "Everyday 12-0",
-            //     "address": "A, Endah Promenade, 10, Jalan 1/149e, Sri Petaling, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur",
-            //     "cuisine": "Kazakh and Russian cuisine",
-            //     "image": "https://media.timeout.com/images/103948102/630/472/image.jpg",
-            //     "rating": 3.8
-            // }
             const { restaurantId } = req.params
             const result = await db.getRestaurantDescriptionById(restaurantId)
             if (!result.length || result.length < 1 || result.length > 1) {
