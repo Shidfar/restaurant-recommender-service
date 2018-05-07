@@ -38,8 +38,8 @@ export function Client(context: Context): DbWrapper {
                     console.log('Could not get connection from the pool.', err)
                     return reject(err)
                 }
-                const q = `UPDATE restaurant_descriptions SET rating=${rating} WHERE id=${restaurantId};
-                           UPDATE restaurants SET rating=${rating} WHERE id=${restaurantId}`
+                const q = `UPDATE restaurant_descriptions SET rating=${rating} WHERE id=${restaurantId}; ` +
+                    `UPDATE restaurants SET rating=${rating} WHERE id=${restaurantId}`
                 connection.query(q, (error, results, fields) => {
                     connection.release()
                     if (error) {
@@ -78,9 +78,9 @@ export function Client(context: Context): DbWrapper {
                     console.log('Could not get connection from the pool.', err)
                     return reject(err)
                 }
-                const q = `SELECT r.id, r.review, u.email FROM reviews r
-                            INNER JOIN users u ON (u.id = r.user_id)
-                            WHERE r.restaurant_id = ${restaurantId}`
+                const q = `SELECT r.id, r.review, u.email FROM reviews r ` +
+                    `INNER JOIN users u ON (u.id = r.user_id) ` +
+                    `WHERE r.restaurant_id = ${restaurantId}`
                 connection.query(q, (error, results, fields) => {
                     connection.release()
                     if (error) {
