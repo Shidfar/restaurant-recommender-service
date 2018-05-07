@@ -12,6 +12,14 @@ To run the server:
     npm run build
     npm start
 ```
+
+To stop the service:
+```
+    whosonport 8044 (should give you the process id that using the port)
+    kill -9 {PID}   (kill the process by ID)
+    whosonport 8044 (should say that nothing is using the port)
+```
+
 To look into the database:
 ```
     mysql -uroot -p
