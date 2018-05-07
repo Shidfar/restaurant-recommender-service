@@ -21,4 +21,5 @@ export interface DbWrapper {
     insertInto(table: string, values: any): Promise<any>
     getRestaurants(): Promise<any>
     getRestaurantDescriptionById(restaurantId: number): Promise<any>
+    getRestaurantMenu(restaurantId: number): Promise<any>
 }

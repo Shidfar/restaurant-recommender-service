@@ -98,10 +98,24 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         }
     })
 
-    app.get('/restaurants/menu/:mId', (req, res) => {
+    app.get('/restaurants/menu/:restaurantId', async (req, res) => {
         try {
-            const { mId } = req.params
-            const obj = JSON.parse(FS.readFileSync(`${dataPath}/menu/${mId}.json`, 'utf8'))
+            const { restaurantId } = req.params
+            const result = await db.getRestaurantMenu(restaurantId)
+            const menuId = result[0] && result[0].menu_id;
+            const menuList = result.map((m: any) => {
+                return {
+                    idFood: m.id,
+                    nameFood: m.name,
+                    description: m.description,
+                    price: m.price
+                }
+            })
+            const obj = {
+                idRestaurant: restaurantId,
+                idMenu: menuId,
+                menuList
+            }
             return res.send(obj)
         } catch (e) {
             console.log(' error while processing request.', e)
