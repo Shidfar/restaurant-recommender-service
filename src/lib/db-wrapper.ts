@@ -9,7 +9,8 @@ export function Client(context: Context): DbWrapper {
         host     : 'localhost',
         user     : 'root',
         password : '1234',
-        database : 'restaurant_recommender_db'
+        database : 'restaurant_recommender_db',
+        multipleStatements: true
     })
 
     function insertInto(table: string, values: any): Promise<any> {
@@ -39,7 +40,7 @@ export function Client(context: Context): DbWrapper {
                     return reject(err)
                 }
                 const q = `UPDATE restaurant_descriptions SET rating=${rating} WHERE id=${restaurantId}; ` +
-                    `UPDATE restaurants SET rating=${rating} WHERE id=${restaurantId}`
+                    `UPDATE restaurants SET rating=${rating} WHERE id=${restaurantId};`
                 connection.query(q, (error, results, fields) => {
                     connection.release()
                     if (error) {
