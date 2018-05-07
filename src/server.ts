@@ -5,7 +5,9 @@ import * as expressValidator from 'express-validator'
 import * as Cors from 'cors'
 import * as FS from 'fs'
 
-import { Context, Config } from 'index'
+import Injector from './lib/dependency-injector'
+import * as DB from './lib/db-wrapper'
+import { Context, DbWrapper } from 'index'
 
 const pkgPath = path.join(__dirname, '../package.json')
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
@@ -41,7 +43,10 @@ export default async () => {
 }
 
 const initializeServices = (context: Context) => {
-    console.log(' >> initializing services.')
+    console.log(' Initializing services.')
+    Injector.current.registerAsSingleton(DB.name, () => {
+        return DB.Client(context)
+    })
 }
 
 const initializeExpressRoutes = (context: Context, app = Express()) => {
@@ -54,8 +59,12 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
     app.use(BodyParser.text())
     app.disable('x-powered-by')
 
-    app.get('/restaurants', (req, res) => {
+    const db = Injector.current.retrieve<DbWrapper>(DB.name)
+
+    app.get('/restaurants', async (req, res) => {
         try {
+            const result = await db.getRestaurants()
+            console.log(JSON.stringify(result, undefined, 2))
             const obj = JSON.parse(FS.readFileSync(`${dataPath}/restaurants-list.json`, 'utf8'))
             return res.send(obj)
         } catch (e) {

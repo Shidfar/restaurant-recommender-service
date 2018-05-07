@@ -16,3 +16,8 @@ interface Application {
 interface Cors {
     allowedOrigins: string[]
 }
+
+export interface DbWrapper {
+    insertInto(table: string, values: any): Promise<any>
+    getRestaurants(): Promise<any>
+}
