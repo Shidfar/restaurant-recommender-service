@@ -137,24 +137,20 @@ const initializeExpressRoutes = (context: Context, app = Express()) => {
         }
     })
 
-    app.post('/user/register', (req, res) => {
+    app.post('/user/register', async (req, res) => {
         try {
-            const { email, password, phone, address } = req.body
-
-            const match = userBase.filter(obj => obj.email === email)
-            if (match.length === 1) {
+            const { email, password, phoneNumber, address } = req.body
+            const result = await db.getUser(email, password)
+            if (result.length > 0) {
                 return res.sendStatus(409)
             }
-
-            const len = userBase.length
-            const userId = userBase[len - 1].userId + 1
-            const obj = { userId, email, password, phone, address }
-            userBase.push(obj)
-            const json = JSON.stringify(userBase, undefined, 2)
-            FS.writeFile(`${dataPath}/users.json`, json, 'utf8', () => {
-                console.log('Write successful.')
-                return res.send({ 'accountId': userId })
-            })
+            const obj = { email, password, phone: phoneNumber, address }
+            await db.insertInto('users', obj)
+            const match = await db.getUser(email, password)
+            if (match.length != 1) {
+                return res.sendStatus(404)
+            }
+            return res.send({ 'accountId': match[0].id })
         } catch (e) {
             console.log(' error while processing request.', e)
             return res.sendStatus(500)
