@@ -33,8 +33,8 @@ CREATE TABLE IF NOT EXISTS restaurant_menu (
     id INT(9) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     restaurant_id INT(9) UNSIGNED NOT NULL,
     FOREIGN KEY (restaurant_id)
-            REFERENCES restaurants (id)
-            ON DELETE CASCADE
+        REFERENCES restaurants (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS food (
@@ -44,6 +44,54 @@ CREATE TABLE IF NOT EXISTS food (
     description TEXT NOT NULL,
     price DOUBLE NOT NULL,
     FOREIGN KEY (menu_id)
-            REFERENCES restaurant_menu (id)
-            ON DELETE CASCADE
+        REFERENCES restaurant_menu (id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT(9) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    restaurant_id INT(9) UNSIGNED NOT NULL,
+    user_id INT(9) UNSIGNED NOT NULL,
+    review TEXT NOT NULL,
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (restaurant_id)
+        REFERENCES restaurants (id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ratings (
+    id INT(9) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    restaurant_id INT(9) UNSIGNED NOT NULL,
+    user_id INT(9) UNSIGNED NOT NULL,
+    rating DOUBLE,
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (restaurant_id)
+        REFERENCES restaurants (id)
+        ON DELETE CASCADE,
+    UNIQUE KEY user_restaurant (restaurant_id, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS orders (
+    id INT(9) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(9) UNSIGNED NOT NULL,
+    order_date TIMESTAMP,
+    FOREIGN KEY (user_id)
+        REFERENCES users (id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS order_food (
+    order_id INT(9) UNSIGNED NOT NULL,
+    food_id INT(9) UNSIGNED NOT NULL,
+    FOREIGN KEY (order_id)
+        REFERENCES orders (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (food_id)
+        REFERENCES food (id)
+        ON DELETE CASCADE,
+
 );
